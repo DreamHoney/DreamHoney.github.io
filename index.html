@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+		body{
+			margin:0;
+		}
+			#box{
+				background: url(myimg/background.jpg);
+			}
+			#decration{
+				height:200px;
+				position: relative;
+				height:40%;
+			}
+			#decration img{
+				width:150px;
+				height:200px;
+				position: absolute;
+				top:0;
+				right:0;
+			}
+			#decration span{
+				width:900px;
+				display: block;
+				margin:0 auto;
+				font-size:40px;
+				color: aqua;
+				font-weight: bold;
+				
+			}
+			ul{
+				margin:0;
+				padding:0;
+				list-style: none;
+			}
+			#content{
+				
+				height:60%;
+			}
+			#content li{
+				float: left;
+				position: relative;
+			}
+			#content li img{
+				width:240px;
+				
+			} 
+			#content li a{
+				width:240px;
+				height:100%;
+				position: absolute;
+			}
+			.clearfix:after{
+				content:"";
+				display: block;
+				clear: both;
+			}
+		</style>
+	</head>
+	<body>
+		<div id = "box">
+			<div id = "decration">
+				<span>欢迎你的到来，以下是我的作品链接，点击进入</span>
+				<img src="myimg/my.jpg" alt=""/>
+			</div>
+			<ul id ="content" class="clearfix">
+				<li>
+					<a href="aiqiyi-pc/index.html"></a>
+					<img src="myimg/4.png" alt="" />
+				</li>
+				<li>
+					<a href="jquery/index.html"></a>
+					<img src="myimg/3.png" alt="" />
+				</li>
+				<li>
+					<a href="baidu/yunload.html"></a>
+					<img src="myimg/2.png" alt="" />
+				</li>
+				
+				<li>
+					<a href="aiqiyi-mobile/index.html"></a>
+					<img src="myimg/1.png" alt="" />
+				</li>
+				
+			</ul>
+		
+		</div>
+		
+		<script>
+			var box = document.getElementById("box");
+			box.style.height = document.documentElement.clientHeight + "px";
+		</script>
+	</body>
+</html>
