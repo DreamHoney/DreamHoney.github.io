@@ -1,0 +1,398 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style>
+			#box{
+				width:600px;
+				height:600px;
+				position: relative;
+				left:400px;
+			}
+			form{
+				width:600px;
+				margin-left:400px;
+				text-align: center;
+			}
+			div{
+				width:196px;
+				height:196px;
+				border:2px solid white;
+				position: absolute;
+			}
+		</style>
+	</head>
+	<body>
+		 <div id="box"></div>
+		 <form action="">
+		 	<input type="button" value="打乱"/>
+		 	<input type="button" value="提示3次"/>
+		 	<input type="button" value="换图片"/>
+		 	<input type="button" value="键盘控制" />
+		 	<input type="button" value="拖拽控制"/>
+		 </form>
+		 <script>
+		 	var box = document.getElementById("box");
+		 	var divs = box.getElementsByTagName("div");
+		 	var inps = document.getElementsByTagName("input");
+		 	var str="";
+		 	var arr=[];
+		 	var Arr=[];
+		 	var change=[];
+		 	var n=0;
+		 	var Left;
+		 	var Top;
+		 	var zindex=0;
+		 	var num;
+		 	var start;
+		 	//控制图片的变换
+		 	var onoff=true;
+		 	//游戏状态  是拖拽控制   还是键盘控制
+		 	var status=1;
+		 	var disX;
+		 	var disY;
+		 	var dir_arr;
+		 	var length;
+		 	var White;
+		 	var Dir_arr;
+		 	var CC;
+		 	//生成小方块
+		 	for(var i=0;i<9;i++){
+		 		str+="<div></div>";
+		 	}
+		 	box.innerHTML=str;
+		 	//添加定位
+		 	for(var j=0;j<divs.length;j++){
+		 		divs[j].style.left=(j%3)*200+"px";
+		 		divs[j].style.top=parseInt((j/3))*200+"px";
+		 	}
+		 	//添加背景图
+		 	bg();
+		 	function bg(){
+		 		for(var j=0;j<divs.length;j++){
+			 		divs[j].style.backgroundImage="url(img/1.jpg)";
+			 		divs[j].style.backgroundPositionX=-(j%3)*200+"px";
+			 		divs[j].style.backgroundPositionY=-parseInt((j/3))*200+"px";
+		 		}
+		 	}
+		 	//存储所有小div的位置
+			for(var i=0;i<divs.length;i++){
+				arr.push([divs[i].offsetLeft,divs[i].offsetTop]);
+			}
+			//将原有位置记录下来
+			for(var i=0;i<arr.length;i++){
+				Arr.push([arr[i][0],arr[i][1]]);
+			}
+		 	//点击换图片按钮
+		 	inps[2].onclick=function(){
+		 		//将存放原有位置的arr恢复为没有打乱的
+		 		arr=[];
+		 		start=0;
+		 		for(var i=0;i<Arr.length;i++){
+					arr.push([Arr[i][0],Arr[i][1]]);
+				}	
+				onoff=!onoff;
+				//使得小div的位置回复
+		 		if(status==1){
+		 			for(var i=0;i<divs.length;i++){
+			 			if(onoff){
+			 				divs[i].style.backgroundImage="url(img/1.jpg)";
+			 			}else{
+			 				divs[i].style.backgroundImage="url(img/2.jpg)";
+			 			}
+			 			divs[i].style.left=Arr[i][0]+"px";
+				 		divs[i].style.top=Arr[i][1]+"px";
+			 		}
+		 		}
+		 		if(status==2){
+			 		for(var i=0;i<divs.length-1;i++){
+			 			if(onoff){
+			 				divs[i].style.backgroundImage="url(img/1.jpg)";
+			 			}else{
+			 				divs[i].style.backgroundImage="url(img/2.jpg)";
+			 			}
+			 			divs[i].style.left=Arr[i][0]+"px";
+				 		divs[i].style.top=Arr[i][1]+"px";
+		 			}	
+		 			divs[divs.length-1].style.backgroundImage="";
+			 	}
+		 		//使得n值 为零  可以重新又提示机会
+		 		n=0;
+		 		inps[1].value="提示"+(3-n)+"次";
+		 		//使得层级从1开始计算
+		 		zindex=0;
+		 		//将所有的小div的层级都降为0
+		 		for(var i=0;i<divs.length;i++){
+		 			divs[i].style.zIndex=zindex;
+		 		}
+		 	}
+			//点击打乱按钮
+		 	inps[0].onclick=function(){
+		 		change=[];
+		 		start=1;
+		 		White=[];
+		 		//将存放原有位置的arr恢复为没有打乱的
+		 		arr=[];
+		 		//声明一个数组  用来存放最开始的位置    其中包括了空白格
+				dir_arr=[];
+				Dir_arr=[];
+		 		for(var i=0;i<Arr.length;i++){
+					arr.push([Arr[i][0],Arr[i][1]]);
+				}
+		 		//将存储小div位置的数组打乱
+		 		arr.sort(function(){
+		 			return Math.random()-0.5;
+		 		})
+		 		//将打乱的位置记录下来   方便以后替换位置
+		 		for(var i=0;i<arr.length;i++){
+		 			change.push([arr[i][0],arr[i][1]]);
+		 		}
+		 		console.log(arr)
+		 		//使得小div按照打乱位置显示
+	 			for(var i=0;i<divs.length;i++){
+		 			divs[i].style.left=arr[i][0]+"px";
+		 			divs[i].style.top=arr[i][1]+"px";
+		 		}
+	 			//将空白格的位置信息记录下来
+		 		White.push([divs[divs.length-1].offsetLeft,divs[divs.length-1].offsetTop]);
+		 		//添加背景图
+		 		if(status==1){
+		 			//当鼠标进行拖拽 的是时候
+				 	for(var j=0;j<divs.length;j++){
+				 		divs[j].index=j;
+				 		if(status==1){
+				 			divs[j].addEventListener("mousedown",fn1);
+				 		}
+				 	}
+		 		}
+	 			//dir_arr和打乱的数组同步
+		 		dir_arr=arr;
+			 	//将空白格的位置信息从数组中删除
+			 	dir_arr.pop();
+			 	//将初始的dir_arr的存起来
+			 	for(var i=0;i<dir_arr.length;i++){
+			 		Dir_arr.push([dir_arr[i][0],dir_arr[i][1]]);
+			 	}
+			 	if(status==2){
+			 		//当用键盘上下左右键控制时
+				 	document.onkeydown=function(ev){
+					 	length = divs.length-1;
+					 	//记录值
+					 	CC=length;
+				 		var e = e||event;
+				 		if(e.keyCode==37){
+				 			dir_l();
+				 		}else if(e.keyCode==38){
+				 			dir_t();
+				 		}else if(e.keyCode==39){
+				 			dir_r();
+				 		}else if(e.keyCode==40){
+				 			dir_b();
+				 		}
+				 	}
+			 	}
+		 	}
+		 	//点击提示按钮
+		 	inps[1].onclick=function(){
+		 		//提示机会有3次
+		 		if(n<=2){
+		 			//按照原有位置显示
+			 		for(var i=0;i<divs.length;i++){
+			 			divs[i].style.left=Arr[i][0]+"px";
+			 			divs[i].style.top=Arr[i][1]+"px";
+			 		}
+			 		//提示3秒后    回归到原有的打乱顺序状态
+			 		setTimeout(function(){
+			 			for(var i=0;i<divs.length;i++){
+				 			divs[i].style.left=arr[i][0]+"px";
+				 			divs[i].style.top=arr[i][1]+"px";
+			 			}
+			 		},3000)
+			 		n++;
+			 		inps[1].value="提示"+(3-n)+"次";
+		 		}
+		 	}
+	 		//按下
+	 		function fn1(ev){
+		 		//记录鼠标的位置    和第几个div
+		 		var e = ev||event;
+		 		disX=e.clientX-this.offsetLeft;
+		 		disY=e.clientY-this.offsetTop;
+		 		num=this.index;
+		 		console.log(num);
+		 		//提升层级
+				zindex++;
+				divs[num].style.zIndex=zindex;
+				Left=this.offsetLeft;
+				Top=this.offsetTop;
+		 		//拖拽   改变div的位置
+		 		if(start==1){
+		 			//拖拽
+		 			document.addEventListener("mousemove",fn2);
+		 			//鼠标抬起
+		 			document.addEventListener("mouseup",fn3);
+		 		}
+		 		e.preventDefault();
+		 	}
+		 	//点击键盘控制
+		 	inps[3].onclick=function(){
+		 		//使得n值 为零  可以重新又提示机会
+		 		n=0;
+		 		inps[1].value="提示"+(3-n)+"次";
+		 		//将div的点击事件置为空
+		 		for(var i=0;i<divs.length;i++){
+		 			divs[i].removeEventListener("mousedown",fn1);
+		 		}
+		 		document.removeEventListener("mousemove",fn2);
+			 	document.removeEventListener("mouseup",fn3);
+		 		//状态   键盘控制
+		 		status=2;
+		 		//按照原有位置显示
+		 		for(var i=0;i<divs.length;i++){
+		 			divs[i].style.left=Arr[i][0]+"px";
+		 			divs[i].style.top=Arr[i][1]+"px";
+		 		}
+	 			//添加背景图
+			 	bg();
+			 	divs[divs.length-1].style.backgroundImage="";
+			 }
+			 	
+			 	//当点击了左键的时候   遍历数组中有没有左边是空白块的   如果有，则这个块向前移动   
+			 	function dir_l(){
+			 		for(var i=0;i<dir_arr.length;i++){
+			 			if(dir_arr[i][0]-200==White[0][0]&&dir_arr[i][1]==White[0][1]){
+			 				JH(i);
+			 				return;
+			 			}
+			 		}
+			 	}
+			 	//当点击了上键的时候   遍历数组中有没有上边是空白块的   如果有，则这个块向上移动   
+			 	function dir_t(){
+			 		for(var i=0;i<dir_arr.length;i++){
+			 			if(dir_arr[i][0]==White[0][0]&&dir_arr[i][1]-200==White[0][1]){
+			 				JH(i);
+			 				return;
+			 			}
+			 		}
+			 	}
+			 	//当点击了下键的时候   遍历数组中有没有下边是空白块的   如果有，则这个块向下移动   
+			 	function dir_b(){
+			 		for(var i=0;i<dir_arr.length;i++){
+			 			if(dir_arr[i][0]==White[0][0]&&dir_arr[i][1]+200==White[0][1]){
+			 				JH(i);
+			 				return;
+			 			}
+			 		}
+			 	}
+			 	//当点击了右键的时候   遍历数组中有没有右边是空白块的   如果有，则这个块向右移动   
+			 	function dir_r(){
+			 		for(var i=0;i<dir_arr.length;i++){
+			 			if(dir_arr[i][0]+200==White[0][0]&&dir_arr[i][1]==White[0][1]){
+							JH(i);
+							return;
+			 			}
+			 		}
+			 	}
+			 	function JH(i){
+			 		//改变空白块的位置
+	 				divs[length].style.left=dir_arr[i][0]+"px";
+	 				divs[length].style.top=dir_arr[i][1]+"px";
+	 				//将存放块位置的数组更新
+	 				dir_arr.splice(i,1,White[0]);
+	 				//改变空白格的值
+	 				CC=i;
+	 				//重新布置空白格的位置
+	 				divs[CC].style.left=White[0][0]+"px";
+	 				divs[CC].style.top=White[0][1]+"px";
+	 				//将新的空白格的位置记录下来
+	 				White=[];
+	 				White.push([divs[length].offsetLeft,divs[length].offsetTop]);
+			 		//判断有没有成功
+	 				var onoff=true;
+	 				for(var i=0;i<dir_arr.length;i++){
+	 					if((dir_arr[i][0]!=Dir_arr[i][0])||(dir_arr[i][1]!=Dir_arr[i][1])){
+	 						onoff=false;
+	 						break;
+	 					}
+	 				}
+	 				if(onoff==true){
+	 					alert("恭喜你，顺利过关");
+	 				}
+			 	}
+		 	//点击拖拽按钮的时候
+		 	inps[4].onclick=function(){
+		 		//使得n值 为零  可以重新又提示机会
+		 		n=0;
+		 		inps[1].value="提示"+(3-n)+"次";
+		 		//状态  拖拽控制
+		 		status=1;
+		 		start=0;
+		 		//添加背景图
+			 	bg();
+		 		//按照原有位置显示
+		 		for(var i=0;i<divs.length;i++){
+		 			divs[i].style.left=Arr[i][0]+"px";
+		 			divs[i].style.top=Arr[i][1]+"px";
+		 		}
+		 	}
+		 	//拖拽
+		 	function fn2(ev){
+		 				var e = ev||event;
+		 				Left=e.clientX-	disX;
+		 				Top=e.clientY-disY;
+		 				//判断范围  不可以超出拼图范围
+		 				Left=Left+divs[num].offsetWidth>box.offsetWidth?box.offsetWidth-divs[num].offsetWidth:Left;
+		 				Top=Top+divs[num].offsetHeight>box.offsetHeight?box.offsetHeight-divs[num].offsetHeight:Top;
+		 				Left=Left<0?0:Left;
+		 				Top=Top<0?0:Top;
+		 				divs[num].style.left=Left+"px";
+		 				divs[num].style.top=Top+"px";
+		 			}
+		 	function fn3(){
+	 				//鼠标抬起   使得移动的div替换掉原有的在这个位置上的div 并使得它们交换位置
+	 				//遍历change数组  找出应该替换掉的div 并改变change
+	 				for(var i=0;i<divs.length;i++){
+ 						//判断范围    实现吸附效果
+ 						if(change[i][0]-20<Left&&Left<change[i][0]+20&&change[i][1]-20<Top&&Top<change[i][1]+20){
+	 						console.log(i);
+	 						if(i==num){	
+		 						divs[num].style.left=change[num][0]+"px";
+	 							divs[num].style.top=change[num][1]+"px";
+	 						}else{
+	 							Left=change[i][0];
+		 						Top=change[i][1];
+		 						divs[num].style.left=Left+"px";
+	 							divs[num].style.top=Top+"px";
+		 						zindex++;
+	 							divs[i].style.zIndex=zindex;
+	 							divs[i].style.left=change[num][0]+"px";
+	 							divs[i].style.top=change[num][1]+"px";
+	 							var a = change[num];
+	 							var b = change[i];
+	 							change.splice(i,1,a);
+	 							change.splice(num,1,b);
+	 							console.log(change)
+	 						}
+ 						}else{
+ 							divs[num].style.left=change[num][0]+"px";
+	 						divs[num].style.top=change[num][1]+"px";
+ 						}
+	 				}
+	 				//判断有没有成功
+	 				var onoff=true;
+	 				for(var i=0;i<divs.length;i++){
+	 					if((Arr[i][0]!=change[i][0])||(Arr[i][1]!=change[i][1])){
+	 						onoff=false;
+	 						break;
+	 					}
+	 				}
+	 				if(onoff==true){
+	 					alert("恭喜你，顺利过关");
+	 				}
+	 				document.removeEventListener("mousemove",fn2);
+	 				document.removeEventListener("mouseup",fn3);
+	 			}
+		 </script>
+	</body>
+</html>

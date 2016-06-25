@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			body,h3{
+				margin: 0px;
+			}
+			a{
+				text-decoration:none;
+				vertical-align:top;
+				cursor: pointer;
+			}
+			img{
+				border:0;
+				vertical-align:top;
+			}
+			ul{
+				margin:0;
+				padding:0;
+				list-style:none;
+			}
+			body{
+				padding:20px;
+			}
+			.fl{
+				float:left;
+			}
+			.clearfix:after{
+				content:"";
+				clear: both;
+				display: block;
+			}
+			.nav-primary{
+				height: 50px;
+				line-height: 44px;
+				font-size: 24px;
+				font-family: "微软雅黑";
+			}
+			.nav-logo a{
+				text-decoration: none;
+			}
+			.search_form{
+				padding: 10px 0 15px 0;
+				margin-left: 20px;
+			}			
+			.search_form .searchText {
+			    width: 200px;
+			    height: 22px;
+			    padding-left: 4px;
+			}
+			.search_form .searchBtn {
+			    width: 50px;
+			    height: 28px;
+			}
+			#list .title{
+				margin-bottom: 10px;
+			}
+			#list li {
+	            margin: 10px;
+	            padding: 10px;
+	            border-bottom: 1px dotted #000;
+	            /*height: 150px;*/
+	        }
+	        #info{
+	        	margin-left: 20px;
+	        }
+	        #loading{
+	            width: 100%;
+	            text-align: center;
+	            display:none;
+	        }
+	        #title {
+	            text-align: right;
+	        }
+	        #title span{
+	        	margin-right: 10px;
+	        }
+		</style>
+	</head>
+	<body>
+		<!--
+			api : https://api.douban.com/v2/book/search?q=javascript&callback=show
+		-->
+		<div class="nav-primary clearfix">
+	      	<div class="nav-logo fl">
+	        	<a href="https://book.douban.com">豆瓣读书</a>
+	      	</div>
+	      	<form action="https://book.douban.com/subject_search" method="get" class="search_form fl">
+				<input type="text" placeholder="书名、作者、ISBN" class="searchText fl">
+				<input type="button" value="搜索" class="searchBtn fl">
+			</form>
+    	</div>
+    	 <div id="title"></div>
+    	<hr/>
+    	<div id="loading">加载中</div>
+		<ul id="list">
+			<!--<li>
+				<h2 class="title">JavaScript:The Good Parts</h2>
+				<div class="box clearfix">
+					<a href="" class="fl">
+						<img src="http://img3.douban.com/mpic/s3400022.jpg" />
+					</a>
+					<div id="info" class="fl">  
+		                <p>克罗克福特 / 东南大学出版社 / 2009-1 /</p>
+		                <p>9.1 (60人评价)</p>
+		                <p>价格 22.40 元起</p>
+					</div>
+				</div>
+			</li>-->
+		</ul>
+		<div id="page">
+			<!--<a href="">上一页</a>
+			<a href="">下一页</a>-->
+		</div>
+		<script src="js/template-native.js"></script>
+		<script>
+			var searchText = document.querySelector(".searchText");
+			var searchBtn = document.querySelector(".searchBtn");
+			var loading = document.getElementById("loading");
+			
+			var start = 0;  //当前起始的数据
+	        var p = 1;  //当前页
+	        var count = 5; //每页显示的数据条数
+	        var pages = 0;
+	        var searchStr = '';
+			searchBtn.onclick = function(){
+				loading.style.display = "block";
+				searchStr = searchText.value;
+				if (searchStr != ''){
+                    search();
+                }else{
+                    alert('请输入要搜索的关键字');
+                }
+			}
+//			searchText.onkeydown = function(ev){
+//				var e = ev||event;
+//				if(e.keyCode == 13){
+//					oading.style.display = "block";
+//					searchStr = searchText.value;
+//					if (searchStr != ''){
+//	                    search();
+//	                }else{
+//	                    alert('请输入要搜索的关键字');
+//	                }
+//	                e.preventDefault();
+//				}
+//			}
+			//根据豆瓣的端口查找输入的数据
+			function search() {
+	            start = (p - 1) * count;
+	            var oScript = document.createElement('script');
+	            oScript.src = 'https://api.douban.com/v2/book/search?q='+ searchStr +'&callback=show&start='+start+'&count=' + count;
+	            document.body.appendChild(oScript);
+	        }
+			//回调函数，把获取到的数据赋给相应的结构
+			function show(data){
+				var list = document.getElementById('list');
+				var title = document.getElementById('title');
+				var page = document.getElementById('page');
+				loading.style.display='none';
+				data.p = p;//当前页
+           		data.pages = Math.ceil(data.total / count);//总页数				
+				//渲染title
+	            var titleHtml = template('titleTemplate', data);
+	            title.innerHTML = titleHtml;
+				//渲染list
+	            var listHtml = template('listTemplate', data);
+	            list.innerHTML = listHtml;
+	            //渲染page
+	            var arr = showPage(data.pages,Number(data.p),10);
+	            data.startPage = arr[0];
+	            data.endPage = arr[1];
+	            console.log(arr);
+	            var pageHtml = template('pageTemplate', data);
+	            page.innerHTML = pageHtml;
+				//给a加上点击事件
+	            var aA = page.getElementsByTagName('a');
+	            for (var i=0; i<aA.length; i++) {
+	                aA[i].onclick = function() {	
+	                    p = this.getAttribute('_p');
+	                    console.log(p);
+	                    search();	
+	                    return false;
+	                }
+	            }
+			}
+			//分页
+			function showPage(pages, page, prepage) {
+	            var start = 0;//起始页
+	            var end = 0;//结束数字
+	            var n = 0;//少算的偏移量	
+	            var offset = Math.floor(prepage / 2);//偏移量	
+	            start = page - offset;//起始页
+	            if (start < 1) {
+	                start = 1;
+	                n = start - (page - offset);
+	            }	
+	            end = page + offset + n;//结束页
+	            if (end > pages) {
+	                end = pages;
+	                start = end - prepage + 1;
+	                start = start > 0 ? start : 1;
+	            }	
+	            return [start, end];
+	        }
+		</script>
+		 <!--title的模板-->
+		<script id="titleTemplate" type="text/html">
+	        <span><%=p%>/<%=pages%></span>
+	        <span>每页显示<%=count%>条</span>
+	        <span>共<%=total%>条</span>
+	    </script>
+		<!--列表的模板-->
+	    <script id="listTemplate" type="text/html">
+	        <%for (var i=0; i<books.length; i++) {%>
+	        <li>
+				<h3 class="title"><%=books[i].title%></h3>
+				<div class="box clearfix">
+					<a href="<%=books[i].alt%>" class="fl">
+						<img src="<%=books[i].image%>" />
+					</a>
+					<div id="info" class="fl">  
+		                <p>
+			                <%=books[i].author.join(' / ')%>
+		                    <%if (books[i].pubdate){%>
+		                        <%=' / ' + books[i].pubdate%>
+		                    <%}%>
+		                <p><%=books[i].rating.average%> (<%=books[i].rating.numRaters%>人评价)</p>
+		                <p><%=books[i].price%></p>
+					</div>
+				</div>
+			</li>
+	        <%}%>	        
+	    </script>
+	    <!--分页的模板-->
+	    <script id="pageTemplate" type="text/html">
+	        <a href="" _p="<%=p-1%>">上一页</a>	
+	        <%for (var i=startPage; i<=endPage; i++) {%>
+	            <%if (i == p) {%>
+	                <span><%=i%></span>
+	            <%} else {%>
+	                <a href="" _p="<%=i%>"><%=i%></a>
+	            <%}%>
+	        <%}%>	
+	        <a href="" _p="<%=p-(-1)%>">下一页</a>
+	     </script>
+	</body>
+</html>
