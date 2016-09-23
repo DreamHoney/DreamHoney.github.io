@@ -79,9 +79,12 @@
 		</style>
 	</head>
 	<body>
+		<div class="doraemon">
+    			<canvas id="face" width="600" height="1500">您的浏览器不支持canvas</canvas>
+		</div>
 		<div id = "box">
 			<div id = "decration">
-				<span>1111111欢迎你的到来，以下是我的作品,点击进入</span>
+				<span>欢迎你的到来，以下是我的作品,点击进入</span>
 				<div id = "xingxi">
 					<i>郭晓丽</i>
 					<i>北京化工大学北方学院</i>
@@ -211,6 +214,87 @@
 						}
 					},30)
 				}
+			var face = document.getElementById('face').getContext("2d");
+			    face.arc(252,252,250,0,2*Math.PI);
+			    face.fillStyle = '#07beea';  //设置填充颜色   //蓝色
+			    face.fill();  //填充
+			    face.lineWidth = 2;   //轮廓线宽度
+			    face.strokeStyle = '#333';   //轮廓线颜色
+			    face.stroke();   //画轮廓线
+			
+			    face.beginPath();     //重置当前绘画路径
+			    face.moveTo(160,450);   //画笔移动到起始点
+			    face.bezierCurveTo(0,400,0,110,210,115);    //三次贝塞尔曲线（左边）
+			    face.lineTo(290,115);
+			    face.bezierCurveTo(500,110,500,400,340,450);
+			    face.bezierCurveTo(280,470,220,470,160,450);
+			    face.fillStyle = '#fff';
+			    face.fill();
+			    face.stroke();   //画出边框
+			//
+			    face.beginPath();         //重置当前绘画路径 用于画眼睛和鼻子
+			    face.moveTo(150,150);
+			    face.lineTo(150,100);        //左眼左竖线
+			    face.bezierCurveTo(160,50,240,50,250,100);   //左眼下面
+			    face.lineTo(250,150);            //左眼右竖线
+			    face.bezierCurveTo(240,200,160,200,150,150);   //左眼上面
+			    face.moveTo(250,150);
+			    face.lineTo(250,100);              //右眼左竖线
+			    face.bezierCurveTo(260,50,340,50,350,100);   //右眼上面
+			    face.lineTo(350,150);               //右眼右竖线
+			    face.bezierCurveTo(340,200,260,200,250,150);   //右眼下面
+			    face.fillStyle = '#fff';
+			    face.fill();
+			    face.stroke();
+			//
+						//  重置当前绘画路径
+			    face.beginPath();
+			    face.arc(225,155,10,0,360*Math.PI/180);   //眼珠
+			    //此时此刻  由于没有重新绘制绘画路径  那么两个眼珠之间会连有一根线
+			    face.arc(275,155,10,0,360*Math.PI/180);
+			    face.fillStyle = '#333';
+			    face.fill();
+			//
+			    face.beginPath();    //鼻子
+			    face.arc(250,197,25,0,360*Math.PI/180);
+			    face.fillStyle = '#c93e00';
+			    face.fill();
+			    face.stroke();
+			//
+			    face.beginPath();
+			    face.arc(260,190,10,0,360*Math.PI/180);
+			    //内外圆 有着共同的圆心  只是半径不同   内层为白的  外层为类似红色
+			    var grd = face.createRadialGradient(260,190,2,260,190,10);     //设置内外圆原点和半径
+			    grd.addColorStop(0,'#fff');
+			    grd.addColorStop(1,'#c93e00');
+			    face.fillStyle = grd;
+			    face.fill();
+			//
+			//    //嘴巴
+			    face.beginPath();
+			    face.moveTo(250,222);
+			    face.lineTo(250,395);
+			    face.moveTo(100,320);
+			    face.bezierCurveTo(180,420,320,420,400,320);
+			    face.lineWidth = 3;
+			    face.stroke();
+			//
+			//    //胡须
+			    face.beginPath();
+			    face.moveTo(80,200);
+			    face.lineTo(180,220);
+			    face.moveTo(80,245);
+			    face.lineTo(180,245);
+			    face.moveTo(80,290);
+			    face.lineTo(180,270);
+			//
+			    face.moveTo(320,220);
+			    face.lineTo(420,200);
+			    face.moveTo(320,245);
+			    face.lineTo(420,245);
+			    face.moveTo(320,270);
+			    face.lineTo(420,290);
+			    face.stroke();
 		</script>
 	</body>
 </html>
